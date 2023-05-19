@@ -15,6 +15,7 @@
 package admin
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -177,6 +178,10 @@ type PulsarAdminConfig struct {
 	ClientID       string
 	Audience       string
 	Key            string
+
+	// TLS Authentication related configuration
+	ClientCertificatePath    string
+	ClientCertificateKeyPath string
 }
 
 // NewPulsarAdmin initialize a pulsar admin client with configuration
@@ -218,9 +223,21 @@ func NewPulsarAdmin(conf PulsarAdminConfig) (PulsarAdmin, error) {
 			return nil, err
 		}
 		adminClient = admin.NewWithAuthProvider(config, oauthProvider)
-	} else {
+	} else if conf.Token != "" {
 		config.Token = conf.Token
 
+		adminClient, err = admin.New(config)
+		if err != nil {
+			return nil, err
+		}
+	} else if conf.ClientCertificatePath != "" {
+		config.AuthPlugin = auth.TLSPluginName
+		config.AuthParams = fmt.Sprintf("{\"tlsCertFile\": %q, \"tlsKeyFile\": %q}", conf.ClientCertificatePath, conf.ClientCertificateKeyPath)
+		adminClient, err = admin.New(config)
+		if err != nil {
+			return nil, err
+		}
+	} else {
 		adminClient, err = admin.New(config)
 		if err != nil {
 			return nil, err
