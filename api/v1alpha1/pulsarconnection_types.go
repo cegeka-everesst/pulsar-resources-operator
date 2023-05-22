@@ -29,7 +29,7 @@ type PulsarConnectionSpec struct {
 	// AdminServiceURL is the admin service url of the pulsar cluster
 	// +optional
 	// +kubebuilder:validation:Pattern="^https?://.+$"
-	AdminServiceURL string `json:"adminServiceURL"`
+	AdminServiceURL string `json:"adminServiceURL,omitempty"`
 
 	// Authentication defines authentication configurations
 	// +optional
