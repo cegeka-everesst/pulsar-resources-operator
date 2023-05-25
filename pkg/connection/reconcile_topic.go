@@ -127,6 +127,7 @@ func (r *PulsarTopicReconciler) ReconcileTopic(ctx context.Context, pulsarAdmin 
 	}
 
 	if topic.Spec.LifecyclePolicy == resourcev1alpha1.CleanUpAfterDeletion {
+		log.Info("Adding finalizer")
 		// TODO use otelcontroller until kube-instrumentation upgrade controller-runtime version to newer
 		controllerutil.AddFinalizer(topic, resourcev1alpha1.FinalizerName)
 		if err := r.conn.client.Update(ctx, topic); err != nil {
@@ -136,6 +137,7 @@ func (r *PulsarTopicReconciler) ReconcileTopic(ctx context.Context, pulsarAdmin 
 	}
 
 	if resourcev1alpha1.IsPulsarResourceReady(topic) {
+		log.Info("already ready")
 		log.V(1).Info("Resource is ready")
 		return nil
 	}
@@ -191,6 +193,7 @@ func (r *PulsarTopicReconciler) ReconcileTopic(ctx context.Context, pulsarAdmin 
 		topic.Status.GeoReplicationEnabled = false
 	}
 
+	log.Info("Applying topic", "params", params)
 	if err := pulsarAdmin.ApplyTopic(topic.Spec.Name, params); err != nil {
 		meta.SetStatusCondition(&topic.Status.Conditions, *NewErrorCondition(topic.Generation, err.Error()))
 		log.Error(err, "Failed to apply topic")
@@ -201,6 +204,7 @@ func (r *PulsarTopicReconciler) ReconcileTopic(ctx context.Context, pulsarAdmin 
 		return err
 	}
 
+	log.Info("getting schema")
 	schema, serr := pulsarAdmin.GetSchema(topic.Spec.Name)
 	if serr != nil && !admin.IsNotFound(serr) {
 		return serr
@@ -233,6 +237,7 @@ func (r *PulsarTopicReconciler) ReconcileTopic(ctx context.Context, pulsarAdmin 
 		}
 	}
 
+	log.Info("updating observed generation and status")
 	topic.Status.ObservedGeneration = topic.Generation
 	meta.SetStatusCondition(&topic.Status.Conditions, *NewReadyCondition(topic.Generation))
 	if err := r.conn.client.Status().Update(ctx, topic); err != nil {
