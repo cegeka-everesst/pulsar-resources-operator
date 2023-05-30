@@ -147,6 +147,9 @@ func (r *PulsarNamespaceReconciler) ReconcileNamespace(ctx context.Context, puls
 		BacklogQuotaLimitSize:       namespace.Spec.BacklogQuotaLimitSize,
 		BacklogQuotaRetentionPolicy: namespace.Spec.BacklogQuotaRetentionPolicy,
 		BacklogQuotaType:            namespace.Spec.BacklogQuotaType,
+		AllowAutoTopicCreation:      namespace.Spec.AllowAutoTopicCreation,
+		TopicType:                   namespace.Spec.TopicType,
+		DefaultNumPartitions:        namespace.Spec.DefaultNumPartitions,
 	}
 
 	if refs := namespace.Spec.GeoReplicationRefs; len(refs) != 0 {
