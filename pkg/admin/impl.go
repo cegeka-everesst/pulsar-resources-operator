@@ -331,6 +331,30 @@ func (p *PulsarAdminClient) applyTenantPolicies(completeNSName string, params *N
 		}
 	}
 
+	if params.AllowAutoTopicCreation != nil || params.TopicType != nil || params.DefaultNumPartitions != nil {
+		allowAutoTopicCreation := false
+		topicType := utils.NonPartitioned
+		partitions := 0
+		if params.AllowAutoTopicCreation != nil {
+			allowAutoTopicCreation = *params.AllowAutoTopicCreation
+		}
+		if params.TopicType != nil {
+			topicType = utils.TopicType(*params.TopicType)
+		}
+		if params.DefaultNumPartitions != nil {
+			partitions = int(*params.DefaultNumPartitions)
+		}
+		topicAutoCreationConfig := utils.TopicAutoCreationConfig{
+			Allow:      allowAutoTopicCreation,
+			Type:       topicType,
+			Partitions: partitions,
+		}
+		err = p.adminClient.Namespaces().SetTopicAutoCreation(*naName, topicAutoCreationConfig)
+		if err != nil {
+			return err
+		}
+	}
+
 	if params.RetentionTime != nil || params.RetentionSize != nil {
 		retentionTime := -1
 		retentionSize := -1

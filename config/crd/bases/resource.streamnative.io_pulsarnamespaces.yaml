@@ -67,6 +67,8 @@ spec:
           spec:
             description: PulsarNamespaceSpec defines the desired state of PulsarNamespace
             properties:
+              allowAutoTopicCreation:
+                type: boolean
               backlogQuotaLimitSize:
                 anyOf:
                 - type: integer
@@ -99,6 +101,9 @@ spec:
                       TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
                 type: object
+              defaultNumPartitions:
+                format: int32
+                type: integer
               geoReplicationRefs:
                 description: GeoReplicationRefs is the reference list to the PulsarGeoReplication
                   resource
@@ -144,6 +149,12 @@ spec:
               retentionTime:
                 description: Retention Should set at least one of them if setting
                   retention
+                type: string
+              topicType:
+                description: TopicType controls the default topic type for topics created in this namespace
+                enum:
+                  - partitioned
+                  - non-partitioned
                 type: string
             required:
             - connectionRef

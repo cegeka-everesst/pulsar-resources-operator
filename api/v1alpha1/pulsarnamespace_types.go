@@ -84,6 +84,15 @@ type PulsarNamespaceSpec struct {
 	// GeoReplicationRefs is the reference list to the PulsarGeoReplication resource
 	// +optional
 	GeoReplicationRefs []*corev1.LocalObjectReference `json:"geoReplicationRefs,omitempty"`
+
+	// +optional
+	AllowAutoTopicCreation *bool `json:"allowAutoTopicCreation,omitempty"`
+
+	// +optional
+	TopicType *string `json:"topicType,omitempty"`
+
+	// +optional
+	DefaultNumPartitions *int32 `json:"defaultNumPartitions,omitempty"`
 }
 
 // PulsarNamespaceStatus defines the observed state of PulsarNamespace
