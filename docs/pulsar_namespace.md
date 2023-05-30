@@ -45,6 +45,9 @@ This table lists specifications available for the `PulsarNamespace` resource.
 | `retentionSize` | The retention size limit(such as 800Mi, 10Gi). | Optional |
 | `lifecyclePolicy` | The resource lifecycle policy. Available options are `CleanUpAfterDeletion` and `KeepAfterDeletion`. By default, it is set to `CleanUpAfterDeletion`. | Optional |
 | `geoReplicationRefs` | The reference list of the PulsarGeoReplication. Enable Geo-replication at the namespace level. It will add the namespace to the clusters. | No |
+| `allowAutoTopicCreation` | Allows topics to be automatically created in this namespace | No |
+| `topicType` | The default topic type for topics created in this namespace. | No |
+| `defaultNumPartitions` | The default number of partitions for partitioned topics created in this namespace. | No |
 
 
 1. Apply the YAML file to create the namespace.

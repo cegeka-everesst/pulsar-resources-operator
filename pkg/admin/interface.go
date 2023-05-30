@@ -50,6 +50,9 @@ type NamespaceParams struct {
 	BacklogQuotaRetentionPolicy *string
 	BacklogQuotaType            *string
 	ReplicationClusters         []string
+	AllowAutoTopicCreation      *bool
+	TopicType                   *string
+	DefaultNumPartitions        *int32
 }
 
 // TopicParams indicates the parameters for creating a topic
