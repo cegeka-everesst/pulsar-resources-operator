@@ -77,6 +77,12 @@ type PulsarAuthenticationTLS struct {
 	ClientCertificateKeyPath string `json:"clientCertificateKeyPath"`
 }
 
+// PulsarAuthenticationTLS indicates the parameters which are need by pulsar TLS Authentication
+type PulsarAuthenticationTLS struct {
+	ClientCertificatePath    string `json:"clientCertificatePath"`
+	ClientCertificateKeyPath string `json:"clientCertificateKeyPath"`
+}
+
 // IsPulsarResourceReady returns true if resource satisfies with these condition
 // 1. The instance is not deleted
 // 2. Status ObservedGeneration is equal with meta.ObservedGeneration
