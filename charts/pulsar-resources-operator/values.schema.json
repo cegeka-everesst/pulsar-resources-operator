@@ -333,6 +333,32 @@
             },
             "additionalProperties": true
         },
+        "volumes": {
+            "$id": "#/properties/volumes",
+            "type": "array",
+            "title": "The volumes schema",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": [
+                []
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/volumes/items"
+            }
+        },
+        "volumeMounts": {
+            "$id": "#/properties/volumeMounts",
+            "type": "array",
+            "title": "The volumeMounts schema",
+            "description": "An explanation about the purpose of this instance.",
+            "examples": [
+                []
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/volumeMounts/items"
+            }
+        },
         "nodeSelector": {
             "$id": "#/properties/nodeSelector",
             "type": "object",
