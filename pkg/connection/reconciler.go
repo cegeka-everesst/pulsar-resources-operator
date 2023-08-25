@@ -193,19 +193,17 @@ func (r *PulsarConnectionReconciler) MakePulsarAdminConfig(ctx context.Context) 
 		return nil, fmt.Errorf("adminServiceURL or adminServiceSecureURL must not be empty")
 	}
 
-	webserviceURL := r.connection.Spec.AdminServiceSecureURL
 	tlsEnableHostnameVerification := r.connection.Spec.TLSEnableHostnameVerification
 	tlsAllowInsecureConnection := r.connection.Spec.TLSAllowInsecureConnection
 	tlsTrustCertsFilePath := r.connection.Spec.TLSTrustCertsFilePath
 
 	if r.connection.Spec.AdminServiceSecureURL == "" {
-		webserviceURL = r.connection.Spec.AdminServiceURL
 		tlsEnableHostnameVerification = false
 		tlsAllowInsecureConnection = true
 		tlsTrustCertsFilePath = ""
 	}
 	cfg := admin.PulsarAdminConfig{
-		WebServiceURL:                 webserviceURL,
+		WebServiceURL:                 r.connection.Spec.AdminServiceURL,
 		TLSAllowInsecureConnection:    tlsAllowInsecureConnection,
 		TLSEnableHostnameVerification: tlsEnableHostnameVerification,
 		TLSTrustCertsFilePath:         tlsTrustCertsFilePath,
