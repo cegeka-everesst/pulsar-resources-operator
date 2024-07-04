@@ -69,6 +69,18 @@ type PulsarConnectionReconciler struct {
 //+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsargeoreplications,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsargeoreplications/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsargeoreplications/finalizers,verbs=update
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarpackages,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarpackages/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarpackages/finalizers,verbs=update
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarfunctions,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarfunctions/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarfunctions/finalizers,verbs=update
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarsinks,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarsinks/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarsinks/finalizers,verbs=update
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarsources,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarsources/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=resource.streamnative.io,resources=pulsarsources/finalizers,verbs=update
 //+kubebuilder:rbac:groups=core,resources=secrets,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -81,8 +93,6 @@ type PulsarConnectionReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *PulsarConnectionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := r.Log.WithValues("pulsarconnection", req.NamespacedName)
-
 	pulsarConnection := &resourcev1alpha1.PulsarConnection{}
 	if err := r.Get(ctx, req.NamespacedName, pulsarConnection); err != nil {
 		if apierrors.IsNotFound(err) {
@@ -92,11 +102,14 @@ func (r *PulsarConnectionReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	}
 
 	if !utils.IsManaged(pulsarConnection) {
-		log.Info("Skipping the object not managed by the controller", "Name", req.String())
+		r.Log.Info("Skipping the object not managed by the controller",
+			"name", req.Name, "namespace", req.Namespace)
 		return reconcile.Result{}, nil
 	}
 
-	reconciler := connection.MakeReconciler(log, r.Client, r.PulsarAdminCreator, pulsarConnection)
+	r.Log.Info("Reconciling PulsarConnection", "name", pulsarConnection.Name, "namespace", pulsarConnection.Namespace)
+
+	reconciler := connection.MakeReconciler(r.Log, r.Client, r.PulsarAdminCreator, pulsarConnection)
 	if err := reconciler.Observe(ctx); err != nil {
 		return ctrl.Result{}, err
 	}
@@ -160,6 +173,42 @@ func (r *PulsarConnectionReconciler) SetupWithManager(mgr ctrl.Manager, options 
 		return err
 	}
 
+	if err := mgr.GetCache().IndexField(context.TODO(), &resourcev1alpha1.PulsarPackage{}, ".spec.connectionRef.name",
+		func(object client.Object) []string {
+			return []string{
+				object.(*resourcev1alpha1.PulsarPackage).Spec.ConnectionRef.Name,
+			}
+		}); err != nil {
+		return err
+	}
+
+	if err := mgr.GetCache().IndexField(context.TODO(), &resourcev1alpha1.PulsarFunction{}, ".spec.connectionRef.name",
+		func(object client.Object) []string {
+			return []string{
+				object.(*resourcev1alpha1.PulsarFunction).Spec.ConnectionRef.Name,
+			}
+		}); err != nil {
+		return err
+	}
+
+	if err := mgr.GetCache().IndexField(context.TODO(), &resourcev1alpha1.PulsarSink{}, ".spec.connectionRef.name",
+		func(object client.Object) []string {
+			return []string{
+				object.(*resourcev1alpha1.PulsarSink).Spec.ConnectionRef.Name,
+			}
+		}); err != nil {
+		return err
+	}
+
+	if err := mgr.GetCache().IndexField(context.TODO(), &resourcev1alpha1.PulsarSource{}, ".spec.connectionRef.name",
+		func(object client.Object) []string {
+			return []string{
+				object.(*resourcev1alpha1.PulsarSource).Spec.ConnectionRef.Name,
+			}
+		}); err != nil {
+		return err
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&resourcev1alpha1.PulsarConnection{}).
 		Watches(&source.Kind{Type: &resourcev1alpha1.PulsarTenant{}},
@@ -175,6 +224,18 @@ func (r *PulsarConnectionReconciler) SetupWithManager(mgr ctrl.Manager, options 
 			handler.EnqueueRequestsFromMapFunc(ConnectionRefMapper),
 			builder.WithPredicates(predicate.GenerationChangedPredicate{})).
 		Watches(&source.Kind{Type: &resourcev1alpha1.PulsarGeoReplication{}},
+			handler.EnqueueRequestsFromMapFunc(ConnectionRefMapper),
+			builder.WithPredicates(predicate.GenerationChangedPredicate{})).
+		Watches(&source.Kind{Type: &resourcev1alpha1.PulsarPackage{}},
+			handler.EnqueueRequestsFromMapFunc(ConnectionRefMapper),
+			builder.WithPredicates(predicate.GenerationChangedPredicate{})).
+		Watches(&source.Kind{Type: &resourcev1alpha1.PulsarFunction{}},
+			handler.EnqueueRequestsFromMapFunc(ConnectionRefMapper),
+			builder.WithPredicates(predicate.GenerationChangedPredicate{})).
+		Watches(&source.Kind{Type: &resourcev1alpha1.PulsarSink{}},
+			handler.EnqueueRequestsFromMapFunc(ConnectionRefMapper),
+			builder.WithPredicates(predicate.GenerationChangedPredicate{})).
+		Watches(&source.Kind{Type: &resourcev1alpha1.PulsarSource{}},
 			handler.EnqueueRequestsFromMapFunc(ConnectionRefMapper),
 			builder.WithPredicates(predicate.GenerationChangedPredicate{})).
 		Watches(&source.Kind{Type: &corev1.Secret{}},
