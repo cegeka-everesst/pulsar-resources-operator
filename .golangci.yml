@@ -17,7 +17,7 @@ linters:
   enable:
   - asciicheck
   - bodyclose
-  - deadcode
+  #- deadcode
   # - depguard
   - dogsled
   - errcheck
@@ -33,7 +33,7 @@ linters:
   - gosec
   - gosimple
   - govet
-  - ifshort
+  #- ifshort
   - importas
   - ineffassign
   - misspell
@@ -45,13 +45,14 @@ linters:
   - revive
   - rowserrcheck
   - staticcheck
-  - structcheck
+  #- structcheck
   - stylecheck
   - thelper
   - typecheck
   - unconvert
   - unparam
-  - varcheck
+  - unused
+  #- varcheck
   - whitespace
 
 linters-settings:
