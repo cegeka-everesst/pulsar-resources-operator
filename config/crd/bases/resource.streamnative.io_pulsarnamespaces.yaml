@@ -76,6 +76,8 @@ spec:
               PulsarNamespaceSpec defines the desired state of a Pulsar namespace.
               It corresponds to the configuration options available in Pulsar's namespace admin API.
             properties:
+              allowAutoTopicCreation:
+                type: boolean
               backlogQuotaLimitSize:
                 anyOf:
                 - type: integer
@@ -133,6 +135,9 @@ spec:
                     type: string
                 type: object
                 x-kubernetes-map-type: atomic
+              defaultNumPartitions:
+                format: int32
+                type: integer
               deduplication:
                 description: Deduplication controls whether to enable message deduplication
                   for the namespace.
@@ -227,6 +232,12 @@ spec:
                   RetentionTime specifies the minimum time to retain messages in the namespace.
                   Should be set in conjunction with RetentionSize for effective retention policy.
                   Retention Quota must exceed configured backlog quota for namespace
+                type: string
+              topicType:
+                description: TopicType controls the default topic type for topics created in this namespace
+                enum:
+                  - partitioned
+                  - non-partitioned
                 type: string
             required:
             - connectionRef

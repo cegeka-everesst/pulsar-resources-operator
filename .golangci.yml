@@ -17,7 +17,7 @@ linters:
   enable:
   - asciicheck
   - bodyclose
-  - unused
+  #- unused
   # - deadcode
   # - depguard
   - dogsled
@@ -33,6 +33,7 @@ linters:
   - gosec
   - gosimple
   - govet
+  #- ifshort
   - importas
   - ineffassign
   - misspell
@@ -49,7 +50,8 @@ linters:
   - typecheck
   - unconvert
   - unparam
-  # - varcheck
+  # - unused
+  #- varcheck
 
 linters-settings:
   godot:

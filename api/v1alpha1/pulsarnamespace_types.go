@@ -117,6 +117,15 @@ type PulsarNamespaceSpec struct {
 	// +optional
 	GeoReplicationRefs []*corev1.LocalObjectReference `json:"geoReplicationRefs,omitempty"`
 
+	// +optional
+	AllowAutoTopicCreation *bool `json:"allowAutoTopicCreation,omitempty"`
+
+	// +optional
+	TopicType *string `json:"topicType,omitempty"`
+
+	// +optional
+	DefaultNumPartitions *int32 `json:"defaultNumPartitions,omitempty"`
+
 	// ReplicationClusters is the list of clusters to which the namespace is replicated
 	// This is **ONLY** used if you are replicating clusters within the same Pulsar instance.
 	// Please use `GeoReplicationRefs` instead if you are setting up geo-replication

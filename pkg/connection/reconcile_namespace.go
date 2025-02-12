@@ -164,6 +164,9 @@ func (r *PulsarNamespaceReconciler) ReconcileNamespace(ctx context.Context, puls
 		OffloadThresholdSize:        namespace.Spec.OffloadThresholdSize,
 		Deduplication:               namespace.Spec.Deduplication,
 		BookieAffinityGroup:         namespace.Spec.BookieAffinityGroup,
+		AllowAutoTopicCreation:      namespace.Spec.AllowAutoTopicCreation,
+		TopicType:                   namespace.Spec.TopicType,
+		DefaultNumPartitions:        namespace.Spec.DefaultNumPartitions,
 	}
 
 	if refs := namespace.Spec.GeoReplicationRefs; len(refs) != 0 || len(namespace.Spec.ReplicationClusters) > 0 {
